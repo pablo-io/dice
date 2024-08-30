@@ -1,0 +1,16 @@
+{
+  "name": "dice-id",
+  "version": "0.0.1",
+  "private": true,
+  "workspaces": [
+    "./ui",
+    "./service"
+  ],
+  "scripts": {
+    "dev:service": "npm run dev --workspace=@diceid/service",
+    "dev:ui": "npm run dev --workspace=@diceid/ui"
+  },
+  "devDependencies": {
+    "npm-run-all": "^4.1.5"
+  }
+}

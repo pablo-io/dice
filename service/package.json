@@ -1,0 +1,28 @@
+{
+  "name": "@diceid/service",
+  "version": "0.0.1",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "test": "jest",
+    "lint": "eslint . --ext .js"
+  },
+  "dependencies": {
+    "@logtail/node": "^0.5.0",
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.6",
+    "cookie-session": "^2.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-prom-bundle": "^7.0.0",
+    "joi": "^17.11.0",
+    "mongoose": "^8.5.1",
+    "on-headers": "^1.0.2",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "winston": "^3.11.0",
+    "xss-clean": "^0.1.4"
+  }
+}
