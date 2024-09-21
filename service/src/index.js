@@ -1,4 +1,7 @@
-require("dotenv").config()
+const dotenv = require("dotenv")
+dotenv.config({ path: '.env.local' });
+dotenv.config();
+
 const path = require('path');
 
 const db = require('./config/mongo');
@@ -12,13 +15,16 @@ async function run() {
 
   await db.init(config);
   const server = app.listen(config.port, () => {
-    logger.info('app started', { port: config.port });
+    console.log(server.address().port);
+    logger.info('app started ' + config.port);
+    logger.flush()
   });
 
   const exitHandler = () => {
     if (server) {
       server.close(() => {
         logger.info('server closed');
+        logger.flush()
         process.exit(1);
       });
     } else {
@@ -28,6 +34,7 @@ async function run() {
 
   const unexpectedErrorHandler = (error) => {
     logger.error('unhandled error', { error });
+    logger.flush()
     exitHandler();
   };
 
@@ -36,6 +43,7 @@ async function run() {
 
   process.on('SIGTERM', () => {
     logger.info('SIGTERM received');
+    logger.flush()
     if (server) {
       server.close();
     }

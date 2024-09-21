@@ -1,0 +1,48 @@
+const Tasks = require("./model");
+const catchAsync = require("../user/middlewares/catchAsync");
+const { getInitData } = require("../../middlewares/auth");
+const { addPoints } = require("../points/services");
+const logger = require("../../config/logger");
+
+const getTasksByUser = async (telegramId) => {
+  return Tasks.find(
+    { userTelegramId: telegramId }
+  );
+};
+
+const initTasksForUser = async (telegramId) => {
+  return await Tasks.insertMany([
+    {
+      userTelegramId: telegramId,
+      name: "Join telegram community",
+      status: "new",
+      link: "https://t.me/diceid_community",
+      points: 200
+    },
+    {
+      userTelegramId: telegramId,
+      name: "Follow us on X",
+      status: "new",
+      link: "https://x.com/diceid_official",
+      points: 200
+    },
+    {
+      userTelegramId: telegramId,
+      name: "Add 🎲 to your name",
+      status: "new",
+      link: "https://diceid.site/api/v1/task/checkDiceInName",
+      points: 700
+    }
+  ]);
+};
+
+const isDiceInName = (user) => {
+  return user.firstName.includes("🎲") || user.lastName.includes("🎲");
+};
+
+
+module.exports = {
+  getTasksByUser,
+  initTasksForUser,
+  isDiceInName
+};

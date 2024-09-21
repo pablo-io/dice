@@ -1,14 +1,19 @@
 {
   "name": "@diceid/service",
   "version": "0.0.1",
+  "type": "commonjs",
   "main": "src/index.js",
   "scripts": {
     "dev": "nodemon src/index.js",
+    "start": "node src/index.js",
     "test": "jest",
     "lint": "eslint . --ext .js"
   },
+
   "dependencies": {
     "@logtail/node": "^0.5.0",
+    "@telegram-apps/init-data-node": "^1.0.4",
+    "async-mutex": "^0.5.0",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
     "cookie-session": "^2.1.0",

@@ -3,7 +3,6 @@ const logger = require('../config/logger');
 
 function loggerMiddleware(req, res, next) {
   const started = new Date();
-  logger.debug('request received', { url: req.url, method: req.method, body: req.body });
 
   onHeaders(res, () => {
     logger.info('response sent', {
@@ -12,6 +11,7 @@ function loggerMiddleware(req, res, next) {
       statusCode: res.statusCode,
       duration: new Date() - started,
     });
+    logger.flush()
   });
 
   next();

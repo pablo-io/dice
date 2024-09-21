@@ -9,6 +9,7 @@ async function init({ mongo: { url } }) {
     await mongoose.connect(mongoUrl);
   } catch (err) {
     logger.error('error in mongo connection', { err });
+    logger.flush()
     setTimeout(init, 5000);
   }
 }
@@ -22,15 +23,18 @@ function destroy() {
 
 db.on('connected', () => {
   logger.info('mongo connected');
+  logger.flush()
 });
 
 db.on('error', (error) => {
   logger.error('error in mongo connection', { error });
+  logger.flush()
   mongoose.disconnect();
 });
 
 db.on('disconnected', () => {
   logger.info('mongo disconnected');
+  logger.flush()
   init({ mongo: { url: mongoUrl } });
 });
 

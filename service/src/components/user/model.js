@@ -5,8 +5,9 @@ const {Schema} = mongoose;
 const UserSchema = new Schema(
     {
         telegramId: {
-            type: String,
+            type: Number,
             required: true,
+            unique: true
         },
         nickname: {
             type: String,

@@ -9,12 +9,15 @@ const controller = require('./controller');
 const router = express.Router();
 const routerPath = "/user"
 
-router.post(`/authenticate`, validate({body: Joi.object().keys({
-        telegramId: telegramId.required(),
-        nickname: Joi.string().required(),
-        referralId: telegramId
+router.post(`/authenticate`, controller.createUser);
 
-    })}), controller.createUser);
+router.get(`/getRewardsList`, controller.getRewardList);
+
+router.get(`/getReferralLink`, controller.getReferralLink);
+
+router.get(`/getUserBalance`, controller.getUserBalance);
+
+router.get(`/getUserTasks`, controller.getUserTasks);
 
 
 router.get('/:telegramId', validate({params: Joi.object().keys({

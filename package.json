@@ -1,16 +1,21 @@
 {
-  "name": "dice-id",
+  "name": "diceid",
   "version": "0.0.1",
   "private": true,
   "workspaces": [
     "./ui",
-    "./service"
+    "./service",
+    "./telegram"
   ],
   "scripts": {
     "dev:service": "npm run dev --workspace=@diceid/service",
-    "dev:ui": "npm run dev --workspace=@diceid/ui"
+    "dev:ui": "npm run dev --workspace=@diceid/ui",
+    "dev:telegram": "npm run dev --workspace=@diceid/telegram"
   },
   "devDependencies": {
     "npm-run-all": "^4.1.5"
+  },
+  "dependencies": {
+    "@logtail/node": "^0.5.0"
   }
 }

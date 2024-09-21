@@ -11,6 +11,7 @@ const createPointsTransaction = catchAsync(async (req, res) => {
         res.status(201).send(points);
     } catch (error) {
         logger.error(error)
+        logger.flush()
         res.status(500).send(error);
     }
 });
@@ -23,6 +24,7 @@ const getPointsHistoryByUserTelegramId = catchAsync(async (req, res) => {
         res.send(points);
     } catch (error) {
         logger.error(error)
+        logger.flush()
         res.status(500).send(error);
     }
 })

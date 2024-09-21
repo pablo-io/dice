@@ -10,14 +10,15 @@ const cookieParser = require("cookie-parser");
 
 
 const v1 = require('./routes/v1/routes');
+const {authMiddleware} = require("./middlewares/auth.js");
 
 const app = express();
 
 
 app.use(
     cors({
-        origin: "http://localhost:3000",
-        methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+        origin: "*",
+        methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
         credentials: true
     })
 );
@@ -47,12 +48,13 @@ app.use(mongoSanitize());
 // compress all responses
 app.use(compression());
 
-// error handler
-app.use(errorHandler);
+app.use(authMiddleware);
 
 //routes
 app.use('/api/v1', v1);
 
+// error handler
+app.use(errorHandler);
 
 
 module.exports = app;

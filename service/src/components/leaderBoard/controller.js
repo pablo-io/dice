@@ -21,11 +21,18 @@ const getLeaderBoard = catchAsync(async (req, res) => {
             {
                 $lookup:
                     {
-                        from: "Users",
+                        from: "users",
                         localField: "_id",
-                        foreignField: "$telegramId",
+                        foreignField: "telegramId",
                         as: "user"
                     }
+            },
+            {
+                $addFields: {
+                    user: {
+                        $arrayElemAt: ["$user", 0],
+                    }
+                },
             },
             {
                 $sort: {
@@ -36,9 +43,11 @@ const getLeaderBoard = catchAsync(async (req, res) => {
                 $skip: skip
             }
         ])
+
         res.status(200).send(leaderBoard);
     } catch (error) {
         logger.error(error)
+        logger.flush()
         res.status(500).send(error);
     }
 });
