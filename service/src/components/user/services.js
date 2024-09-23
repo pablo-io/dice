@@ -1,3 +1,18 @@
+const User = require("./model");
+
+
+const getRandomUserOpponent = async (ignoreUsername) => {
+    let username = ""
+    while (username === "") {
+        const opponent = await User.aggregate().sample(1)
+        if (ignoreUsername !== opponent[0].nickname) {
+            username = opponent[0].nickname
+        }
+    }
+
+    return username
+}
+
 const getNewUserInitPoints = (telegramId) => {
     const mainBonus = maxConsecutiveSymbolsPrize(telegramId.toString())
     const extraBonus = combinationPrize(telegramId.toString())
@@ -9,7 +24,6 @@ const getNewUserInitPoints = (telegramId) => {
         extraBonus
     }
 }
-
 
 function maxConsecutiveSymbolsPrize(telegramIdString) {
     let maxCount = 0;
@@ -98,5 +112,6 @@ function combinationPrize(telegramIdString) {
 }
 
 module.exports = {
+    getRandomUserOpponent,
     getNewUserInitPoints
 }

@@ -75,3 +75,8 @@
     overflow-y: auto;
   }
 }
+
+.die-container {
+  border-radius: 9px !important;
+  box-shadow: 0 0 177px 13px rgba(142, 7, 255, 0.05) !important;
+}

@@ -5,7 +5,7 @@ import {TypographyH3} from "@/components/ui/TypographyH3.tsx";
 
 import {Input} from "@/components/ui/input.tsx";
 import {referralApi} from "@/api/referralApi.ts";
-import {useToast} from "@/hooks/use-toast.ts";
+import {useToast} from "@/hooks/use-toast.tsx";
 import {Card, CardContent, CardHeader} from "@/components/ui/card.tsx";
 
 export const Friends: FC = () => {
@@ -16,7 +16,6 @@ export const Friends: FC = () => {
   useEffect(() => {
     let ignore = false;
     referralApi()
-      .then(resp => resp?.json())
       .then(response => {
         if (!ignore) {
           setLink(response.link);

@@ -10,84 +10,80 @@ import {Card, CardContent, CardHeader} from "@/components/ui/card.tsx";
 import {cn} from "@/lib/utils.ts";
 import {Button} from "@/components/ui/button.tsx";
 import diceImg from "../../assets/cube.png";
+import {useToast} from "@/hooks/use-toast.tsx";
+import {ToastAction} from "@/components/ui/toast.tsx";
 
 export const Main = () => {
+  const {toast} = useToast();
+
   const [balance, setBalance] = useState(0);
   const [isGame, setIsGame] = useState(false);
-  const [error, setError] = useState(null);
-  const user1 = useRef<ReactDiceRef>();
-  const user2 = useRef<ReactDiceRef>();
+  const [error, setError] = useState(false);
+  const dice1 = useRef<ReactDiceRef>();
+  const dice2 = useRef<ReactDiceRef>();
   const playButton = useRef<HTMLButtonElement | null>(null);
   const navigate = useNavigate();
-  const [user1Color, setUser1Color] = useState("muted");
-  const [user2Color, setUser2Color] = useState("muted");
-
-  useEffect(() => {
-    if (error) {
-      if (playButton?.current && "innerText" in playButton.current) {
-        playButton.current.innerText = error;
-      }
-    }
-  }, [error]);
+  const [user1, setUser1] = useState("muted");
+  const [user2, setUser2] = useState({username: "", color: "muted"});
 
   useEffect(() => {
     let ignore = false;
-    pointsApi()
-      .then(resp => resp?.json())
-      .then(response => {
-        if (!ignore) {
-          setBalance(response.totalQuantity);
-        }
-      });
+    pointsApi().then(response => {
+      if (!ignore) {
+        setBalance(response.totalQuantity);
+      }
+    });
     return () => {
       ignore = true;
     };
   }, []);
 
   const roll = () => {
-    if (!error) {
+    if (!error && !isGame) {
       setIsGame(true);
+      diceApi().then(response => {
+        if (response.error) {
+          setError(true);
+          setIsGame(false);
+          toast({
+            title: "Ooops!",
+            description: response.error,
+            action: <ToastAction altText="Ok">Ok</ToastAction>,
+          });
+        } else {
+          setUser2({color: "muted", username: response.opponent.username});
+          setUser1("primary");
+
+          dice1.current?.rollAll([response.you.number]);
+          setTimeout(() => {
+            setUser1("muted");
+            setUser2({
+              username: response.opponent.username,
+              color: "primary",
+            });
+            dice2.current?.rollAll([response.opponent.number]);
+          }, 2000);
+          setTimeout(() => {
+            if (response.you.number > response.opponent.number) {
+              setUser1("primary");
+              setUser2({
+                username: response.opponent.username,
+                color: "muted",
+              });
+            }
+          }, 4000);
+          setTimeout(() => {
+            pointsApi().then(response => {
+              setBalance(response.totalQuantity);
+            });
+            setUser1("muted");
+            setUser2({username: "", color: "muted"});
+            setIsGame(false);
+          }, 6000);
+        }
+      });
     }
   };
-
-  useEffect(() => {
-    if (isGame) {
-      diceApi()
-        .then(resp => resp?.json())
-        .then(response => {
-          if (response.error) {
-            setError(response.error);
-            setIsGame(false);
-          } else {
-            setUser1Color("primary");
-            user1.current?.rollAll([response.you]);
-            setTimeout(() => {
-              setUser1Color("muted");
-              setUser2Color("primary");
-              user2.current?.rollAll([response.opponent]);
-            }, 2000);
-
-            setTimeout(() => {
-              if (response.you > response.opponent) {
-                setUser1Color("primary");
-                setUser2Color("muted");
-              }
-            }, 4000);
-
-            setTimeout(() => {
-              pointsApi()
-                .then(resp => resp?.json())
-                .then(response => {
-                  setBalance(response.totalQuantity);
-                });
-              setUser1Color("muted");
-              setUser2Color("muted");
-              setIsGame(false);
-            }, 6000);
-          }
-        });
-    }
-  }, [isGame]);
 
   return (
     <>
@@ -115,42 +111,49 @@ export const Main = () => {
       {isGame && (
         <div className={cn(styles.diceWrapper, "my-auto")}>
           <div className={styles.diceArea}>
-            <p className={`text-${user1Color}`}>You 𓁿</p>
+            <p className={`text-${user1}`}>You 𓁿</p>
             <ReactDice
               dieCornerRadius={10}
               disableIndividual
-              faceColor={`hsl(var(--${user1Color}))`}
-              dotColor={`hsl(var(--${user1Color}-foreground))`}
+              faceColor={`hsl(var(--${user1}))`}
+              dotColor={`hsl(var(--${user1}-foreground))`}
               defaultRoll={1}
               numDice={1}
-              ref={user1 as RefObject<ReactDiceRef>}
+              ref={dice1 as RefObject<ReactDiceRef>}
               rollDone={() => null}
             />
           </div>
           <div className={styles.diceArea}>
-            <p className={`text-${user2Color}`}>Anonimus (⌐■_■)</p>
+            <p className={`text-${user2.color}`}>{user2?.username} (⌐■_■)</p>
             <ReactDice
               dieCornerRadius={10}
               disableIndividual
-              faceColor={`hsl(var(--${user2Color}))`}
-              dotColor={`hsl(var(--${user2Color}-foreground))`}
+              faceColor={`hsl(var(--${user2.color}))`}
+              dotColor={`hsl(var(--${user2.color}-foreground))`}
               defaultRoll={1}
               numDice={1}
-              ref={user2 as RefObject<ReactDiceRef>}
+              ref={dice2 as RefObject<ReactDiceRef>}
               rollDone={() => null}
             />
           </div>
         </div>
       )}
       {!isGame && (
-        <div className={cn(styles.diceBg, "my-auto")}>
-          <img src={diceImg} alt="Dice Cube" />
-        </div>
-      )}
+        <>
+          <div className={cn(styles.diceBg, "my-auto", error && "opacity-10")}>
+            <img src={diceImg} alt="Dice Cube" />
+          </div>
 
-      <Button onClick={roll} ref={playButton} className="w-full p-5 mt-auto">
-        🎲 Play 🎲
-      </Button>
+          {!error && (
+            <Button
+              onClick={roll}
+              ref={playButton}
+              className="w-full p-5 mt-auto">
+              🎲 Play 🎲
+            </Button>
+          )}
+        </>
+      )}
     </>
   );
 };

@@ -1,4 +1,4 @@
-import {FC, useEffect, useState} from "react";
+import {FC, useEffect, useMemo, useState} from "react";
 import {Button} from "@/components/ui/button.tsx";
 import {TypographyLead} from "@/components/ui/TypographyLead.tsx";
 import {TypographyP} from "@/components/ui/TypographyP.tsx";
@@ -24,33 +24,34 @@ export const Tasks: FC = () => {
   }> | null>(null);
 
   const doTask = async (id: string) => {
-    await doneTaskApi(id, user?.id as number)
-      .then(resp => resp?.json())
-      .then(response => {
-        if (response.link) {
-          postEvent("web_app_open_link", {url: response.link});
-        }
-      });
-    await getTasksApi()
-      .then(resp => resp?.json())
-      .then(response => {
-        setTasks(response);
-      });
+    await doneTaskApi(id, user?.id as number).then(response => {
+      if (response.link) {
+        postEvent("web_app_open_link", {url: response.link});
+      }
+    });
+    await getTasksApi().then(response => {
+      setTasks(response);
+    });
   };
 
   useEffect(() => {
     let ignore = false;
-    getTasksApi()
-      .then(resp => resp?.json())
-      .then(response => {
-        if (!ignore) {
-          setTasks(response);
-        }
-      });
+    getTasksApi().then(response => {
+      if (!ignore) {
+        setTasks(response);
+      }
+    });
     return () => {
       ignore = true;
     };
   }, []);
+
+  const getTasks = useMemo(() => {
+    if (tasks && tasks?.length > 1) {
+      return tasks;
+    }
+    return [];
+  }, [tasks]);
 
   return (
     <>
@@ -62,8 +63,8 @@ export const Tasks: FC = () => {
           </TypographyLead>
         </CardHeader>
         <CardContent className="overflow-y-auto flex-grow h-full">
-          <ScrollArea className="w-full px-4">
-            {tasks?.map(task => (
+          <ScrollArea className="w-full">
+            {getTasks.map(task => (
               <div className="relative w-full my-5" key={task.name}>
                 <TypographyP className="">{task.name}</TypographyP>
                 <TypographySmall className="text-muted-foreground">

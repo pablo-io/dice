@@ -43,7 +43,7 @@ export const Menu: FC<{className: string}> = ({className}) => {
         {menu.map(item => {
           return (
             <ToggleGroupItem
-              className="flex flex-col w-16 h-16 data-[state=on]:border data-[state=on]:border-primary data-[state=on]:bg-none! hover:bg-none!"
+              className="flex flex-col w-16 h-16 data-[state=on]:border data-[state=on]:border-primary-border data-[state=on]:shadow-glow data-[state=on]:bg-none! hover:bg-none!"
               key={item.path}
               value={item.path}
               aria-label="Toggle bold">

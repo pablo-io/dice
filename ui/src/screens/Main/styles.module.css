@@ -1,12 +1,8 @@
 .diceWrapper {
   width: 90%;
-  height: 150px;
   display: flex;
   flex-direction: row;
   justify-content: space-around;
-  background: hsl(var(--muted) / 0.4);
-  box-shadow: 0 0 15px 10px hsl(var(--muted) / 0.4);
-  border-radius: 100px;
 }
 
 .diceArea {
@@ -17,12 +13,9 @@
 }
 
 .diceBg {
-  background: hsl(var(--muted) / 0.4);
-  box-shadow: 0 0 15px 10px hsl(var(--muted) / 0.4);
-  width: 220px;
-  height: 220px;
+  width: 300px;
+  height: 300px;
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 100px;
 }

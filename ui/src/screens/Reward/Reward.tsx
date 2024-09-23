@@ -26,13 +26,11 @@ export const Reward: FC = () => {
 
   useEffect(() => {
     let ignore = false;
-    rewardApi()
-      .then(resp => resp?.json())
-      .then(response => {
-        if (!ignore) {
-          setRewards(response);
-        }
-      });
+    rewardApi().then(response => {
+      if (!ignore) {
+        setRewards(response);
+      }
+    });
     return () => {
       ignore = true;
     };
@@ -56,7 +54,7 @@ export const Reward: FC = () => {
           {rewards.mainBonus.example}
         </TypographyP>
         <Button className="absolute right-0 top-1/4">
-          {rewards.mainBonus.points} 🎲
+          + {rewards.mainBonus.points} 🎲
         </Button>
       </div>
       <Separator className="w-11/12 mb-8" />
@@ -74,7 +72,7 @@ export const Reward: FC = () => {
           </TypographyP>
           {item.points ? (
             <Button className="absolute right-0 top-1/4">
-              {item.points} 🎲
+              + {item.points} 🎲
             </Button>
           ) : (
             <Button variant="secondary" className="absolute right-0 top-1/4">
@@ -84,7 +82,7 @@ export const Reward: FC = () => {
         </div>
       ))}
       <Button onClick={() => navigate("/")} className="w-full p-5">
-        Continue +{rewards.totalPoints} 🎲
+        Home
       </Button>
     </>
   );

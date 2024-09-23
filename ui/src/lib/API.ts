@@ -1,6 +1,7 @@
 import {Logtail} from "@logtail/browser";
 import {retrieveLaunchParams} from "@telegram-apps/sdk";
 import testTgData from "../assets/test.json";
+import {setErrorToast} from "@/hooks/use-toast.tsx";
 
 const logtail = new Logtail(import.meta.env.VITE_BETTERSTACK);
 
@@ -28,9 +29,11 @@ export const API = async (
       },
       body: JSON.stringify(body),
     });
-    return response;
+    return await response.json();
   } catch (e: unknown) {
-    await logtail.error(e as string);
+    setErrorToast((e as Record<string, string>).message);
+
+    await logtail.error((e as Record<string, string>).message);
     await logtail.flush();
   }
 };

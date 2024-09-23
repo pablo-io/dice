@@ -29,6 +29,7 @@ export default {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+          border: "hsl(var(--primary) / 0.8)",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -66,6 +67,9 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      boxShadow: {
+        glow: "0 0 100px 1px rgba(142, 7, 255, 0.15)",
       },
       keyframes: {
         "accordion-down": {

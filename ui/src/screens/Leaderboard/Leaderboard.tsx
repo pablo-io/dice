@@ -18,13 +18,11 @@ export const Leaderboard: FC = () => {
 
   useEffect(() => {
     let ignore = false;
-    getLeaderBoard("1")
-      .then(resp => resp?.json())
-      .then(response => {
-        if (!ignore) {
-          setLeaderboard(response);
-        }
-      });
+    getLeaderBoard("1").then(response => {
+      if (!ignore) {
+        setLeaderboard(response);
+      }
+    });
     return () => {
       ignore = true;
     };
@@ -41,7 +39,7 @@ export const Leaderboard: FC = () => {
         </CardHeader>
         <CardContent className="overflow-y-auto flex-grow h-full">
           <ScrollArea>
-            {leaderboard.map((item, index) => (
+            {leaderboard?.map((item, index) => (
               <div key={index}>
                 <div className="w-full flex justify-between my-4">
                   <TypographyLead>{index + 1}. </TypographyLead>
