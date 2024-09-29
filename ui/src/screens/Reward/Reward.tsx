@@ -28,7 +28,7 @@ export const Reward: FC = () => {
     let ignore = false;
     rewardApi().then(response => {
       if (!ignore) {
-        setRewards(response);
+        setRewards(response?.body);
       }
     });
     return () => {

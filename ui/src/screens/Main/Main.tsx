@@ -21,7 +21,6 @@ export const Main = () => {
   const [error, setError] = useState(false);
   const dice1 = useRef<ReactDiceRef>();
   const dice2 = useRef<ReactDiceRef>();
-  const playButton = useRef<HTMLButtonElement | null>(null);
   const navigate = useNavigate();
   const [user1, setUser1] = useState("muted");
   const [user2, setUser2] = useState({username: "", color: "muted"});
@@ -29,8 +28,8 @@ export const Main = () => {
   useEffect(() => {
     let ignore = false;
     pointsApi().then(response => {
-      if (!ignore) {
-        setBalance(response.totalQuantity);
+      if (!ignore && response?.body?.totalQuantity) {
+        setBalance(response?.body.totalQuantity);
       }
     });
     return () => {
@@ -42,39 +41,42 @@ export const Main = () => {
     if (!error && !isGame) {
       setIsGame(true);
       diceApi().then(response => {
-        if (response.error) {
+        if (response?.body.error) {
           setError(true);
           setIsGame(false);
           toast({
             title: "Ooops!",
-            description: response.error,
+            description: response?.body.error,
             action: <ToastAction altText="Ok">Ok</ToastAction>,
           });
         } else {
-          setUser2({color: "muted", username: response.opponent.username});
+          setUser2({
+            color: "muted",
+            username: response?.body.opponent.username,
+          });
           setUser1("primary");
 
-          dice1.current?.rollAll([response.you.number]);
+          dice1.current?.rollAll([response?.body.you.number]);
           setTimeout(() => {
             setUser1("muted");
             setUser2({
-              username: response.opponent.username,
+              username: response?.body.opponent.username,
               color: "primary",
             });
-            dice2.current?.rollAll([response.opponent.number]);
+            dice2.current?.rollAll([response?.body.opponent.number]);
           }, 2000);
           setTimeout(() => {
-            if (response.you.number > response.opponent.number) {
+            if (response?.body.you.number > response?.body.opponent.number) {
               setUser1("primary");
               setUser2({
-                username: response.opponent.username,
+                username: response?.body.opponent.username,
                 color: "muted",
               });
             }
           }, 4000);
           setTimeout(() => {
             pointsApi().then(response => {
-              setBalance(response.totalQuantity);
+              setBalance(response?.body.totalQuantity);
             });
             setUser1("muted");
             setUser2({username: "", color: "muted"});
@@ -102,8 +104,8 @@ export const Main = () => {
           </div>
           <p
             onClick={() => navigate(`/reward`)}
-            className="mt-2 text-xs text-muted-foreground underline">
-            Your reward
+            className="mt-2 text-xs text-muted-foreground underline cursor-pointer">
+            Your ID reward
           </p>
         </CardContent>
       </Card>
@@ -144,11 +146,14 @@ export const Main = () => {
             <img src={diceImg} alt="Dice Cube" />
           </div>
 
-          {!error && (
+          {error ? (
             <Button
-              onClick={roll}
-              ref={playButton}
+              onClick={() => navigate("/tasks")}
               className="w-full p-5 mt-auto">
+              Don't miss out on your rewards!
+            </Button>
+          ) : (
+            <Button onClick={roll} className="w-full p-5 mt-auto">
               🎲 Play 🎲
             </Button>
           )}

@@ -14,22 +14,22 @@ const initTasksForUser = async (telegramId) => {
   return await Tasks.insertMany([
     {
       userTelegramId: telegramId,
-      name: "Join telegram community",
-      status: "new",
+      name: "Join community",
+      status: "subscribe",
       link: "https://t.me/diceid_community",
       points: 200
     },
     {
       userTelegramId: telegramId,
       name: "Follow us on X",
-      status: "new",
+      status: "subscribe",
       link: "https://x.com/diceid_official",
       points: 200
     },
     {
       userTelegramId: telegramId,
       name: "Add 🎲 to your name",
-      status: "new",
+      status: "check",
       link: "https://diceid.site/api/v1/task/checkDiceInName",
       points: 700
     }

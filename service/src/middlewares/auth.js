@@ -51,7 +51,6 @@ const authMiddleware = (req, res, next) => {
 };
 
 module.exports = {
-    setInitData,
     getInitData,
     authMiddleware
 }

@@ -7,20 +7,22 @@ import {ScrollArea} from "@/components/ui/scroll-area.tsx";
 import {TypographyP} from "@/components/ui/TypographyP.tsx";
 import {Button} from "@/components/ui/button.tsx";
 
+interface User {
+  _id: string;
+  nickname: string;
+  rank: number;
+  totalQuantity: number;
+}
 export const Leaderboard: FC = () => {
-  const [leaderboard, setLeaderboard] = useState<
-    Array<{
-      _id: string;
-      user: {nickname: string};
-      totalQuantity: number;
-    }>
-  >([]);
+  const [leaderboard, setLeaderboard] = useState<Array<User>>([]);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     let ignore = false;
     getLeaderBoard("1").then(response => {
       if (!ignore) {
-        setLeaderboard(response);
+        setLeaderboard(response?.body.leaderboard);
+        setUser(response?.body.current);
       }
     });
     return () => {
@@ -37,14 +39,26 @@ export const Leaderboard: FC = () => {
             See where you stand and challenge to the top dicers!
           </TypographyLead>
         </CardHeader>
+        <CardContent className="pb-1 shadow-glow">
+          {user !== null && (
+            <div className="w-full flex justify-between my-4">
+              <TypographyLead>{user.rank}. </TypographyLead>
+              <TypographyP className="mr-auto pl-1">
+                {user.nickname}
+              </TypographyP>
+              <Button>{user.totalQuantity} 🎲</Button>
+            </div>
+          )}
+        </CardContent>
+
         <CardContent className="overflow-y-auto flex-grow h-full">
           <ScrollArea>
             {leaderboard?.map((item, index) => (
               <div key={index}>
                 <div className="w-full flex justify-between my-4">
-                  <TypographyLead>{index + 1}. </TypographyLead>
+                  <TypographyLead>{item.rank}. </TypographyLead>
                   <TypographyP className="mr-auto pl-1">
-                    {item.user.nickname}
+                    {item.nickname}
                   </TypographyP>
                   <Button>{item.totalQuantity} 🎲</Button>
                 </div>

@@ -1,6 +1,6 @@
 // Use require instead of import because of the error "Cannot use import statement outside a module"
-import {Telegraf} from 'telegraf'
-import {message} from 'telegraf/filters'
+import { Telegraf } from "telegraf";
+import { message } from "telegraf/filters";
 
 
 /**
@@ -13,21 +13,21 @@ import {message} from 'telegraf/filters'
  *
  */
 export function launchBot(token) {
-    // Create a bot using the token received from @BotFather(https://t.me/BotFather)
-    const bot = new Telegraf(token)
+  // Create a bot using the token received from @BotFather(https://t.me/BotFather)
+  const bot = new Telegraf(token);
 
-    // Assign bot listeners
-    listenToCommands(bot)
-    listenToQueries(bot)
-    listenToMiniAppData(bot)
+  // Assign bot listeners
+  listenToCommands(bot);
+  listenToQueries(bot);
+  listenToMiniAppData(bot);
 
-    // Launch the bot
-    bot.launch().then(() => console.log('bot launched'))
+  // Launch the bot
+  bot.launch().then(() => console.log("bot launched"));
 
-    // Handle stop events
-    enableGracefulStop(bot)
+  // Handle stop events
+  enableGracefulStop(bot);
 
-    return bot
+  return bot;
 }
 
 /**
@@ -37,15 +37,22 @@ export function launchBot(token) {
  *
  */
 function listenToCommands(bot) {
-    // Register a listener for the /start command, and reply with a message whenever it's used
-    bot.start(async (ctx) => {
-        await ctx.reply("Welcome to DiceId bot!")
-    })
+  // Register a listener for the /start command, and reply with a message whenever it's used
+  bot.start(async (ctx) => {
 
-    // Register a listener for the /help command, and reply with a message whenever it's used
-    bot.help(async (ctx) => {
-        await ctx.reply("Run the /start command to use our app")
-    })
+    await ctx.reply("Welcome to DiceID bot!", {
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: "🎲 Play!", url: process.env.APP_URL }]
+        ]
+      }
+    });
+  });
+
+  // Register a listener for the /help command, and reply with a message whenever it's used
+  bot.help(async (ctx) => {
+    await ctx.reply("Run the /start command to use our app");
+  });
 }
 
 /**
@@ -55,18 +62,18 @@ function listenToCommands(bot) {
  * @param bot Telegraf bot instance
  */
 function listenToMiniAppData(bot) {
-    bot.on("message", async (ctx) => {
-        if (ctx.message?.web_app_data?.data) {
-            try {
-                const data = ctx.message?.web_app_data?.data
-                await ctx.telegram.sendMessage(ctx.message.chat.id, 'Got message from MiniApp')
-                await ctx.telegram.sendMessage(ctx.message.chat.id, data)
-            } catch (e) {
-                await ctx.telegram.sendMessage(ctx.message.chat.id, 'Got message from MiniApp but failed to read')
-                await ctx.telegram.sendMessage(ctx.message.chat.id, e)
-            }
-        }
-    });
+  bot.on("message", async (ctx) => {
+    if (ctx.message?.web_app_data?.data) {
+      try {
+        const data = ctx.message?.web_app_data?.data;
+        await ctx.telegram.sendMessage(ctx.message.chat.id, "Got message from MiniApp");
+        await ctx.telegram.sendMessage(ctx.message.chat.id, data);
+      } catch (e) {
+        await ctx.telegram.sendMessage(ctx.message.chat.id, "Got message from MiniApp but failed to read");
+        await ctx.telegram.sendMessage(ctx.message.chat.id, e);
+      }
+    }
+  });
 }
 
 
@@ -77,31 +84,31 @@ function listenToMiniAppData(bot) {
  *
  */
 function listenToQueries(bot) {
-    bot.on("callback_query", async (ctx) => {
-        // Explicit usage
-        await ctx.telegram.answerCbQuery(ctx.callbackQuery.id)
+  bot.on("callback_query", async (ctx) => {
+    // Explicit usage
+    await ctx.telegram.answerCbQuery(ctx.callbackQuery.id);
 
-        // Using context shortcut
-        await ctx.answerCbQuery()
-    })
+    // Using context shortcut
+    await ctx.answerCbQuery();
+  });
 
-    bot.on("inline_query", async (ctx) => {
-        const article = {
-            type: 'article',
-            id: ctx.inlineQuery.id,
-            title: 'Message for query',
-            input_message_content: {
-                message_text: `Message for query`
-            }
-        }
+  bot.on("inline_query", async (ctx) => {
+    const article = {
+      type: "article",
+      id: ctx.inlineQuery.id,
+      title: "Message for query",
+      input_message_content: {
+        message_text: `Message for query`
+      }
+    };
 
-        const result = [article]
-        // Explicit usage
-        await ctx.telegram.answerInlineQuery(ctx.inlineQuery.id, result)
+    const result = [article];
+    // Explicit usage
+    await ctx.telegram.answerInlineQuery(ctx.inlineQuery.id, result);
 
-        // Using context shortcut
-        await ctx.answerInlineQuery(result)
-    })
+    // Using context shortcut
+    await ctx.answerInlineQuery(result);
+  });
 }
 
 /**
@@ -111,7 +118,7 @@ function listenToQueries(bot) {
  *
  */
 function enableGracefulStop(bot) {
-    // Enable graceful stop
-    process.once('SIGINT', () => bot.stop('SIGINT'))
-    process.once('SIGTERM', () => bot.stop('SIGTERM'))
+  // Enable graceful stop
+  process.once("SIGINT", () => bot.stop("SIGINT"));
+  process.once("SIGTERM", () => bot.stop("SIGTERM"));
 }

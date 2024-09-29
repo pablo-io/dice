@@ -11,8 +11,11 @@ import {useTelegramUser} from "@/hooks/useTelegramUser";
 import {ExternalLink} from "lucide-react";
 import {Card, CardContent, CardHeader} from "@/components/ui/card.tsx";
 import {postEvent} from "@telegram-apps/sdk";
+import {ToastAction} from "@/components/ui/toast.tsx";
+import {useToast} from "@/hooks/use-toast.tsx";
 
 export const Tasks: FC = () => {
+  const {toast} = useToast();
   const user = useTelegramUser();
 
   const [tasks, setTasks] = useState<Array<{
@@ -25,20 +28,34 @@ export const Tasks: FC = () => {
 
   const doTask = async (id: string) => {
     await doneTaskApi(id, user?.id as number).then(response => {
-      if (response.link) {
-        postEvent("web_app_open_link", {url: response.link});
+      if (response?.status === 400) {
+        toast({
+          title: "Ooops!",
+          description: response?.body.error,
+          action: <ToastAction altText="Ok">Ok</ToastAction>,
+        });
+      } else if (response?.body.link) {
+        const regex = /(?:https?:\/\/)?(?:www\.)?t\.me\/([a-zA-Z0-9_]+)/;
+        const match = response?.body.link.match(regex);
+        if (match) {
+          postEvent("web_app_open_tg_link", {path_full: "/" + match[1]});
+        } else {
+          postEvent("web_app_open_link", {url: response?.body.link});
+        }
       }
     });
-    await getTasksApi().then(response => {
-      setTasks(response);
-    });
+    setTimeout(() => {
+      getTasksApi().then(response => {
+        setTasks(response?.body);
+      });
+    }, 2000);
   };
 
   useEffect(() => {
     let ignore = false;
     getTasksApi().then(response => {
       if (!ignore) {
-        setTasks(response);
+        setTasks(response?.body);
       }
     });
     return () => {
@@ -59,7 +76,7 @@ export const Tasks: FC = () => {
         <CardHeader>
           <TypographyH3>Tasks</TypographyH3>
           <TypographyLead>
-            Complete tasks <span className="text-primary">earn 🎲</span>
+            Complete tasks and <span className="text-primary">earn 🎲</span>
           </TypographyLead>
         </CardHeader>
         <CardContent className="overflow-y-auto flex-grow h-full">
@@ -70,15 +87,23 @@ export const Tasks: FC = () => {
                 <TypographySmall className="text-muted-foreground">
                   + {task.points} 🎲
                 </TypographySmall>
-                {task.status === "done" ? (
+                {task.status === "done" && (
                   <Button disabled className="absolute right-0 top-2">
                     + {task.points} 🎲
                   </Button>
-                ) : (
+                )}
+                {task.status === "subscribe" && (
                   <Button
                     onClick={() => doTask(task._id)}
                     className="absolute right-0 top-2">
                     Earn <ExternalLink className="ml-2 h-5 w-5" />
+                  </Button>
+                )}
+                {task.status === "check" && (
+                  <Button
+                    onClick={() => doTask(task._id)}
+                    className="absolute right-0 top-2">
+                    Check
                   </Button>
                 )}
               </div>

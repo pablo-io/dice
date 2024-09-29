@@ -3,7 +3,7 @@ const logger = require("../../config/logger");
 const catchAsync = require("./middlewares/catchAsync");
 const { getNewUserInitPoints } = require("./services");
 const Points = require("../points/model");
-const { referralBonus, addPoints } = require("../points/services");
+const { referralBonus, addPoints, getReferralEarnings } = require("../points/services");
 const { initTasksForUser, getTasksByUser, markTaskDoneByUser } = require("../tasks/services");
 const { getInitData } = require("../../middlewares/auth.js");
 const Mutex = require("async-mutex").Mutex;
@@ -29,13 +29,9 @@ const authenticateUser = async (req, res) => {
           });
           if (initData?.startParam) {
             await referralBonus(initData?.startParam, 1000);
-            await Points.create({ userTelegramId: initData.user.id, amount: 100, pointType: "referral" });
+            await Points.create({ userTelegramId: initData.user.id, amount: 100, pointType: "initial" });
           }
-          await Points.create({
-            userTelegramId: initData.user.id,
-            amount: getNewUserInitPoints(initData.user.id).totalPoints,
-            pointType: "initial"
-          });
+          await addPoints(initData.user.id, getNewUserInitPoints(initData.user.id).totalPoints, "initial")
           await initTasksForUser(initData.user.id);
 
           res.status(201).send(JSON.stringify(newUser));
@@ -78,6 +74,20 @@ const getReferralLink = catchAsync(async (req, res) => {
   }
 });
 
+const getReferralStats = catchAsync(async (req, res) => {
+  const initData = getInitData(res);
+
+  try {
+    const user = await User.findOne({ telegramId: initData.user.id });
+    const referralUsers = await User.find({ referralId: user._id })
+    res.status(200).send({ users: referralUsers.length, amount: await getReferralEarnings(initData.user.id)});
+  } catch (error) {
+    logger.error(error);
+    logger.flush();
+    res.status(500).send(error);
+  }
+});
+
 const getUserBalance = catchAsync(async (req, res) => {
   const initData = getInitData(res);
 
@@ -93,7 +103,12 @@ const getUserBalance = catchAsync(async (req, res) => {
         }
       }
     ]);
-    res.status(200).send(userBalance[0]);
+    if (userBalance.length > 0) {
+      res.status(200).send(userBalance[0]);
+    } else {
+      res.status(200).send({totalQuantity: 0});
+    }
+
   } catch (error) {
     await logger.error(error);
     await logger.flush();
@@ -145,6 +160,7 @@ const deleteUser = catchAsync(async (req, res) => {
 module.exports = {
   createUser: authenticateUser,
   getRewardList,
+  getReferralStats,
   getReferralLink,
   getUserBalance,
   getUserTasks,

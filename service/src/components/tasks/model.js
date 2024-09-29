@@ -16,7 +16,7 @@ const TaskSchema = new Schema(
         },
         status: {
             type: String,
-            enum: ['new', 'done'],
+            enum: ['check', 'subscribe', 'done'],
             required: true,
         },
         link: {

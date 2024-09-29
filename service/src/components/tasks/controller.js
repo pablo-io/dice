@@ -20,7 +20,7 @@ const doneTaskById = catchAsync(async (req, res) => {
           await addPoints(initData.user.id, task.points, "activity");
           res.status(200).send({success: true})
         }
-        res.status(400).send({error: "Dice emoji not found"})
+        res.status(400).send({error: "🎲 emoji not found"})
       } else {
         await Tasks.updateOne({_id: taskId}, {$set: {status: "done"}})
         await addPoints(initData.user.id, task.points, "activity");

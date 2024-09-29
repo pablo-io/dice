@@ -14,23 +14,5 @@
       "username": "pablo_io"
     }
   },
-  "initDataRaw": "user=%7B%22id%22%3A518649549%2C%22first_name%22%3A%22Pablo.%F0%9F%8E%B2%22%2C%22last_name%22%3A%22%22%2C%22username%22%3A%22pablo_io%22%2C%22language_code%22%3A%22en%22%2C%22allows_write_to_pm%22%3Atrue%7D&chat_instance=-7147430944445642200&chat_type=sender&auth_date=1726916906&hash=f84b8a499c7dee8380f0120b4df78e7b2cfd57e1bd591581ba93f84b95032b99",
-  "platform": "macos",
-  "startParam": "66e161d7b08da2af7a04dac8",
-  "themeParams": {
-    "linkColor": "#62bcf9",
-    "hintColor": "#b1c3d5",
-    "sectionHeaderTextColor": "#b1c3d5",
-    "subtitleTextColor": "#b1c3d5",
-    "textColor": "#ffffff",
-    "buttonColor": "#2ea6ff",
-    "sectionBgColor": "#18222d",
-    "accentTextColor": "#2ea6ff",
-    "buttonTextColor": "#ffffff",
-    "secondaryBgColor": "#131415",
-    "bgColor": "#18222d",
-    "headerBgColor": "#131415",
-    "destructiveTextColor": "#ef5b5b"
-  },
-  "version": "7.2"
+  "initDataRaw": "user=%7B%22id%22%3A518649549%2C%22first_name%22%3A%22Pablo.%22%2C%22last_name%22%3A%22%22%2C%22username%22%3A%22pablo_io%22%2C%22language_code%22%3A%22en%22%2C%22allows_write_to_pm%22%3Atrue%7D&chat_instance=4679332984490158140&chat_type=sender&auth_date=1727631543&hash=387178c2e021547056de22e34f94404c918616a93f37dfce25ca2e3b9f96b24e"
 }

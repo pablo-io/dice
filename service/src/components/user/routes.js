@@ -15,6 +15,8 @@ router.get(`/getRewardsList`, controller.getRewardList);
 
 router.get(`/getReferralLink`, controller.getReferralLink);
 
+router.get(`/getUserReferralsStats`, controller.getReferralStats);
+
 router.get(`/getUserBalance`, controller.getUserBalance);
 
 router.get(`/getUserTasks`, controller.getUserTasks);

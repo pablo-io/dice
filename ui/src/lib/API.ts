@@ -29,7 +29,10 @@ export const API = async (
       },
       body: JSON.stringify(body),
     });
-    return await response.json();
+    return {
+      status: response.status,
+      body: await response.json(),
+    };
   } catch (e: unknown) {
     setErrorToast((e as Record<string, string>).message);
 

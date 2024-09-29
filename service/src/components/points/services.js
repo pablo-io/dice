@@ -35,4 +35,24 @@ const referralBonus = async (referralId, fullAmount) => {
     }
 }
 
-module.exports = {addPoints, removePoints, referralBonus}
+const getReferralEarnings = async (telegramId) => {
+    const user = await Points.aggregate([
+        {
+            $match: {
+                userTelegramId: telegramId,
+                pointType: "referral",
+            }
+        },
+        {
+            $group: {
+                _id: "$userTelegramId",
+                count: {
+                    $sum: "$amount"
+                }
+            }
+        },
+    ]);
+    return user[0].count
+}
+
+module.exports = {addPoints, removePoints, referralBonus, getReferralEarnings}

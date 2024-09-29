@@ -38,7 +38,7 @@ const diceGame = catchAsync(async (req, res) => {
         pointType: "dice"
       });
 
-      if (gamesAfterLastBan.length > 5) {
+      if (gamesAfterLastBan.length > 10) {
         let chanceOfBan = randomInt(0, 10);
         if (chanceOfBan > 5 && chanceOfBan <= 7) {
           await Dice.findOneAndUpdate({ userTelegramId: initData.user.id }, { bannedTill: new Date(Date.now() + 3600000) }, {
