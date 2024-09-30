@@ -1,5 +1,5 @@
 import {Logtail} from "@logtail/browser";
-import {retrieveLaunchParams} from "@telegram-apps/sdk";
+import {postEvent, retrieveLaunchParams} from "@telegram-apps/sdk";
 import testTgData from "../assets/test.json";
 import {setErrorToast} from "@/hooks/use-toast.tsx";
 
@@ -14,7 +14,7 @@ export const API = async (
   try {
     let initDataRaw;
 
-    if (import.meta.env.MODE !== "production") {
+    if (import.meta.env.MODE === "development") {
       initDataRaw = testTgData.initDataRaw;
     } else {
       initDataRaw = retrieveLaunchParams().initDataRaw;
@@ -29,6 +29,12 @@ export const API = async (
       },
       body: JSON.stringify(body),
     });
+    if (response.status === 401) {
+      setErrorToast(
+        "Your telegram login expired, please reopen the DiceID",
+        () => postEvent("web_app_close"),
+      );
+    }
     return {
       status: response.status,
       body: await response.json(),

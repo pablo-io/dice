@@ -12,6 +12,8 @@ import {Button} from "@/components/ui/button.tsx";
 import diceImg from "../../assets/cube.png";
 import {useToast} from "@/hooks/use-toast.tsx";
 import {ToastAction} from "@/components/ui/toast.tsx";
+import {CircleHelp} from "lucide-react";
+import {postEvent} from "@telegram-apps/sdk";
 
 export const Main = () => {
   const {toast} = useToast();
@@ -42,13 +44,15 @@ export const Main = () => {
       setIsGame(true);
       diceApi().then(response => {
         if (response?.body.error) {
-          setError(true);
           setIsGame(false);
-          toast({
-            title: "Ooops!",
-            description: response?.body.error,
-            action: <ToastAction altText="Ok">Ok</ToastAction>,
-          });
+          if (response.status !== 401) {
+            setError(true);
+            toast({
+              title: "Ooops!",
+              description: response?.body.error,
+              action: <ToastAction altText="Ok">Ok</ToastAction>,
+            });
+          }
         } else {
           setUser2({
             color: "muted",
@@ -89,7 +93,14 @@ export const Main = () => {
 
   return (
     <>
-      <Card className="w-2/4">
+      <CircleHelp
+        className="stroke-muted absolute top-2 right-2"
+        size={40}
+        onClick={() =>
+          postEvent("web_app_open_tg_link", {path_full: "/DiceID_support"})
+        }
+      />
+      <Card className="w-auto">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"></CardHeader>
         <CardContent>
           <div className="text-2xl font-bold inline-flex">
@@ -142,7 +153,9 @@ export const Main = () => {
       )}
       {!isGame && (
         <>
-          <div className={cn(styles.diceBg, "my-auto", error && "opacity-10")}>
+          <div
+            onClick={roll}
+            className={cn(styles.diceBg, "my-auto", error && "opacity-10")}>
             <img src={diceImg} alt="Dice Cube" />
           </div>
 

@@ -47,7 +47,8 @@ const getLeaderBoard = catchAsync(async (req, res) => {
       },
       {
         $skip: skip
-      }
+      },
+      { $limit : limit }
     ]);
     const currentUser = await User.aggregate([
       {

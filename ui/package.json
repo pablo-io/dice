@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:test": "tsc -b && vite build --mode staging --outDir stage",
     "lint": "eslint . --fix",
     "format": "prettier --write .",
     "preview": "vite preview"

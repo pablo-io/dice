@@ -7,6 +7,7 @@ __benchmarks__
 build/
 .module-cache
 *.log*
+stage
 *.sublime-project
 *.sublime-workspace
 .idea

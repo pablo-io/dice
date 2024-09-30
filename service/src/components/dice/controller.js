@@ -18,11 +18,11 @@ const diceGame = catchAsync(async (req, res) => {
       const timeLeft = new Date(new Date(userBanRecord.bannedTill).getTime() - Date.now());
       res.status(403).send({ error: `Bad luck! You'll have to wait ${timeLeft.getMinutes()} minutes` });
     } else {
-      let playerNumber = randomInt(1, 6);
-      let opponentNumber = randomInt(1, 6);
+      let playerNumber = randomInt(1, 7);
+      let opponentNumber = randomInt(1, 7);
       while (playerNumber === opponentNumber) {
-        playerNumber = randomInt(1, 6);
-        opponentNumber = randomInt(1, 6);
+        playerNumber = randomInt(1, 7);
+        opponentNumber = randomInt(1, 7);
       }
       if (playerNumber > opponentNumber) {
         await addPoints(initData.user.id, 10, "dice");

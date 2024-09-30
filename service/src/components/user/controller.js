@@ -1,9 +1,9 @@
 const User = require("./model");
 const logger = require("../../config/logger");
 const catchAsync = require("./middlewares/catchAsync");
-const { getNewUserInitPoints } = require("./services");
+const { getNewUserInitPoints, referralCodeInit } = require("./services");
 const Points = require("../points/model");
-const { referralBonus, addPoints, getReferralEarnings } = require("../points/services");
+const { addPoints, getReferralEarnings } = require("../points/services");
 const { initTasksForUser, getTasksByUser, markTaskDoneByUser } = require("../tasks/services");
 const { getInitData } = require("../../middlewares/auth.js");
 const Mutex = require("async-mutex").Mutex;
@@ -18,18 +18,27 @@ const authenticateUser = async (req, res) => {
       const initData = getInitData(res);
 
       try {
+        const name = initData.user.username ?? initData.user.firstName + "" + initData.user?.lastName
         let user = await User.findOne({ telegramId: initData.user.id });
         if (user) {
-          res.status(200).send(user);
+          if (user.nickname === name){
+            res.status(200).send(user);
+          } else {
+            await User.updateOne(
+              { telegramId: initData.user.id },
+              { $set: { nickname: name } }
+            )
+            res.status(200).send(await User.findOne({ telegramId: initData.user.id }));
+          }
         } else {
+          const name = initData.user.username ?? initData.user.firstName + "" + initData.user?.lastName
           const newUser = await User.create({
             telegramId: +initData.user.id,
-            nickname: initData.user.username,
+            nickname: name,
             referralId: initData?.startParam
           });
           if (initData?.startParam) {
-            await referralBonus(initData?.startParam, 1000);
-            await Points.create({ userTelegramId: initData.user.id, amount: 100, pointType: "initial" });
+            await referralCodeInit(initData.startParam)
           }
           await addPoints(initData.user.id, getNewUserInitPoints(initData.user.id).totalPoints, "initial")
           await initTasksForUser(initData.user.id);

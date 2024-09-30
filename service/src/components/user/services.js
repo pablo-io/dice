@@ -1,5 +1,19 @@
 const User = require("./model");
+const { referralBonus } = require("../points/services");
+const Points = require("../points/model");
 
+
+const referralCodeInit = async (referralId) => {
+    const influensersId = [
+      "66f986275bc7c6e4db108435" //herman
+    ]
+
+    if (influensersId.indexOf(referralId) === -1) {
+        await referralBonus(initData?.startParam, 1000);
+    }
+    await Points.create({ userTelegramId: initData.user.id, amount: 100, pointType: "initial" });
+    return true
+}
 
 const getRandomUserOpponent = async (ignoreUsername) => {
     let username = ""
@@ -112,6 +126,7 @@ function combinationPrize(telegramIdString) {
 }
 
 module.exports = {
+    referralCodeInit,
     getRandomUserOpponent,
     getNewUserInitPoints
 }

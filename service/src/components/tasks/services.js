@@ -1,8 +1,4 @@
 const Tasks = require("./model");
-const catchAsync = require("../user/middlewares/catchAsync");
-const { getInitData } = require("../../middlewares/auth");
-const { addPoints } = require("../points/services");
-const logger = require("../../config/logger");
 
 const getTasksByUser = async (telegramId) => {
   return Tasks.find(

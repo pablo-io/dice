@@ -1,4 +1,5 @@
 const {validate, parse} =  require('@telegram-apps/init-data-node');
+const logger = require("../config/logger");
 
 /**
  * Sets init data in the specified Response object.
@@ -36,12 +37,14 @@ const authMiddleware = (req, res, next) => {
                 // Validate init data.
                 validate(authData, process.env.BOT_TOKEN, {
                     // We consider init data sign valid for 1 hour from their creation moment.
-                    expiresIn: process.env.TOKEN_EXPIRE,
+                    // expiresIn: process.env.TOKEN_EXPIRE, TODO Bug
                 });
                 // Parse init data. We will surely need it in the future.
                 setInitData(res, parse(authData));
                 return next();
             } catch (e) {
+                logger.error("Unauthorized: " + authData);
+                logger.flush();
                 return next(new Error('Unauthorized'));
             }
         // ... other authorization methods.

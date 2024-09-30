@@ -166,7 +166,7 @@ function toast({...props}: Toast) {
   };
 }
 
-const setErrorToast = (description: string) => {
+const setErrorToast = (description: string, handleClick?: () => void) => {
   toast({
     variant: "destructive",
     title: "Ooops!",
@@ -174,7 +174,11 @@ const setErrorToast = (description: string) => {
     action: (
       <ToastAction
         onClick={() => {
-          window.location.reload();
+          if (handleClick) {
+            handleClick();
+          } else {
+            window.location.reload();
+          }
         }}
         altText="Reload">
         Reload!

@@ -39,8 +39,8 @@ export const Leaderboard: FC = () => {
             See where you stand and challenge to the top dicers!
           </TypographyLead>
         </CardHeader>
-        <CardContent className="pb-1 shadow-glow">
-          {user !== null && (
+        <CardContent className="pb-1 shadow-glow p-2">
+          {!!user && (
             <div className="w-full flex justify-between my-4">
               <TypographyLead>{user.rank}. </TypographyLead>
               <TypographyP className="mr-auto pl-1">
@@ -51,7 +51,7 @@ export const Leaderboard: FC = () => {
           )}
         </CardContent>
 
-        <CardContent className="overflow-y-auto flex-grow h-full">
+        <CardContent className="overflow-y-auto flex-grow h-full p-2">
           <ScrollArea>
             {leaderboard?.map((item, index) => (
               <div key={index}>
