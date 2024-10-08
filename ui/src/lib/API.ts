@@ -2,6 +2,7 @@ import {Logtail} from "@logtail/browser";
 import {postEvent, retrieveLaunchParams} from "@telegram-apps/sdk";
 import testTgData from "../assets/test.json";
 import {setErrorToast} from "@/hooks/use-toast.tsx";
+import {useAppStatusStore} from "@/store/statusStore.ts";
 
 const logtail = new Logtail(import.meta.env.VITE_BETTERSTACK);
 
@@ -44,5 +45,27 @@ export const API = async (
 
     await logtail.error((e as Record<string, string>).message);
     await logtail.flush();
+  } finally {
+    let initDataRaw;
+
+    if (import.meta.env.MODE === "development") {
+      initDataRaw = testTgData.initDataRaw;
+    } else {
+      initDataRaw = retrieveLaunchParams().initDataRaw;
+    }
+    const response = await fetch(`${import.meta.env.VITE_API}/user/status`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `tma ${initDataRaw}`,
+        ...headers,
+      },
+    });
+
+    const statuses = await response.json();
+
+    useAppStatusStore.setState({
+      tasksStatusCircle: statuses.tasksStatusCircle,
+    });
   }
 };

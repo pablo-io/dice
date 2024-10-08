@@ -1,10 +1,10 @@
 const User = require("./model");
 const logger = require("../../config/logger");
 const catchAsync = require("./middlewares/catchAsync");
-const { getNewUserInitPoints, referralCodeInit } = require("./services");
+const { getNewUserInitPoints, referralCodeInit, getUserBalanceService } = require("./services");
 const Points = require("../points/model");
-const { addPoints, getReferralEarnings } = require("../points/services");
-const { initTasksForUser, getTasksByUser, markTaskDoneByUser } = require("../tasks/services");
+const { getReferralEarnings } = require("../points/services");
+const { initTasksForUser, isActiveTasks } = require("../tasks/services");
 const { getInitData } = require("../../middlewares/auth.js");
 const Mutex = require("async-mutex").Mutex;
 
@@ -18,29 +18,33 @@ const authenticateUser = async (req, res) => {
       const initData = getInitData(res);
 
       try {
-        const name = initData.user.username ?? initData.user.firstName + "" + initData.user?.lastName
+        const name = initData.user.username ?? initData.user.firstName + "" + initData.user?.lastName;
         let user = await User.findOne({ telegramId: initData.user.id });
         if (user) {
-          if (user.nickname === name){
+          if (user.nickname === name) {
             res.status(200).send(user);
           } else {
             await User.updateOne(
               { telegramId: initData.user.id },
               { $set: { nickname: name } }
-            )
+            );
             res.status(200).send(await User.findOne({ telegramId: initData.user.id }));
           }
         } else {
-          const name = initData.user.username ?? initData.user.firstName + "" + initData.user?.lastName
+          const name = initData.user.username ?? initData.user.firstName + "" + initData.user?.lastName;
           const newUser = await User.create({
             telegramId: +initData.user.id,
             nickname: name,
             referralId: initData?.startParam
           });
           if (initData?.startParam) {
-            await referralCodeInit(initData.startParam)
+            await referralCodeInit(initData.startParam);
           }
-          await addPoints(initData.user.id, getNewUserInitPoints(initData.user.id).totalPoints, "initial")
+          await Points.create({
+            userTelegramId: initData.user.id,
+            amount: getNewUserInitPoints(initData.user.id).totalPoints,
+            pointType: "initial"
+          });
           await initTasksForUser(initData.user.id);
 
           res.status(201).send(JSON.stringify(newUser));
@@ -56,6 +60,20 @@ const authenticateUser = async (req, res) => {
     });
 
 };
+
+
+const initApp = catchAsync(async (req, res) => {
+  const initData = getInitData(res);
+
+  try {
+    const tasksStatusCircle = await isActiveTasks(initData.user.id);
+    res.status(200).send({ tasksStatusCircle });
+  } catch (error) {
+    logger.error(error);
+    logger.flush();
+    res.status(500).send(error);
+  }
+});
 
 const getRewardList = catchAsync(async (req, res) => {
   const initData = getInitData(res);
@@ -88,8 +106,8 @@ const getReferralStats = catchAsync(async (req, res) => {
 
   try {
     const user = await User.findOne({ telegramId: initData.user.id });
-    const referralUsers = await User.find({ referralId: user._id })
-    res.status(200).send({ users: referralUsers.length, amount: await getReferralEarnings(initData.user.id)});
+    const referralUsers = await User.find({ referralId: user._id });
+    res.status(200).send({ users: referralUsers.length, amount: await getReferralEarnings(initData.user.id) });
   } catch (error) {
     logger.error(error);
     logger.flush();
@@ -101,42 +119,14 @@ const getUserBalance = catchAsync(async (req, res) => {
   const initData = getInitData(res);
 
   try {
-    const userBalance = await Points.aggregate([
-      { $match: { userTelegramId: initData.user.id } },
-      {
-        $group: {
-          _id: "$userTelegramId",
-          totalQuantity: {
-            $sum: "$amount"
-          }
-        }
-      }
-    ]);
-    if (userBalance.length > 0) {
-      res.status(200).send(userBalance[0]);
-    } else {
-      res.status(200).send({totalQuantity: 0});
-    }
+    const userBalance = await getUserBalanceService(initData.user.id);
+    res.status(200).send(userBalance);
 
   } catch (error) {
     await logger.error(error);
     await logger.flush();
     res.status(500).send(error);
   }
-});
-
-const getUserTasks = catchAsync(async (req, res) => {
-  const initData = getInitData(res);
-
-  try {
-    const tasks = await getTasksByUser(initData.user.id);
-    res.status(200).send(tasks);
-  } catch (error) {
-    await logger.error(error);
-    await logger.flush();
-    res.status(500).send(error);
-  }
-
 });
 
 const getUserById = catchAsync(async (req, res) => {
@@ -172,7 +162,7 @@ module.exports = {
   getReferralStats,
   getReferralLink,
   getUserBalance,
-  getUserTasks,
   getUserById,
-  deleteUser
+  deleteUser,
+  initApp
 };

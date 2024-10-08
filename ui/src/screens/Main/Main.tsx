@@ -19,7 +19,9 @@ export const Main = () => {
   const {toast} = useToast();
 
   const [balance, setBalance] = useState(0);
-  const [isGame, setIsGame] = useState(false);
+  const [gameStatus, setGameStatus] = useState<"closed" | "game" | "loading">(
+    "closed",
+  );
   const [error, setError] = useState(false);
   const dice1 = useRef<ReactDiceRef>();
   const dice2 = useRef<ReactDiceRef>();
@@ -40,11 +42,11 @@ export const Main = () => {
   }, []);
 
   const roll = () => {
-    if (!error && !isGame) {
-      setIsGame(true);
+    if (!error && gameStatus === "closed") {
+      setGameStatus("loading");
       diceApi().then(response => {
         if (response?.body.error) {
-          setIsGame(false);
+          setGameStatus("closed");
           if (response.status !== 401) {
             setError(true);
             toast({
@@ -54,13 +56,17 @@ export const Main = () => {
             });
           }
         } else {
-          setUser2({
-            color: "muted",
-            username: response?.body.opponent.username,
-          });
-          setUser1("primary");
+          setTimeout(() => {
+            setGameStatus("game");
+            setUser2({
+              color: "muted",
+              username: response?.body.opponent.username,
+            });
+            setUser1("primary");
 
-          dice1.current?.rollAll([response?.body.you.number]);
+            dice1.current?.rollAll([response?.body.you.number]);
+          }, 1000);
+
           setTimeout(() => {
             setUser1("muted");
             setUser2({
@@ -68,7 +74,7 @@ export const Main = () => {
               color: "primary",
             });
             dice2.current?.rollAll([response?.body.opponent.number]);
-          }, 2000);
+          }, 3000);
           setTimeout(() => {
             if (response?.body.you.number > response?.body.opponent.number) {
               setUser1("primary");
@@ -77,15 +83,15 @@ export const Main = () => {
                 color: "muted",
               });
             }
-          }, 4000);
+          }, 5000);
           setTimeout(() => {
             pointsApi().then(response => {
               setBalance(response?.body.totalQuantity);
             });
             setUser1("muted");
             setUser2({username: "", color: "muted"});
-            setIsGame(false);
-          }, 6000);
+            setGameStatus("closed");
+          }, 7000);
         }
       });
     }
@@ -121,37 +127,56 @@ export const Main = () => {
         </CardContent>
       </Card>
 
-      {isGame && (
+      {gameStatus !== "closed" && (
         <div className={cn(styles.diceWrapper, "my-auto")}>
           <div className={styles.diceArea}>
-            <p className={`text-${user1}`}>You 𓁿</p>
-            <ReactDice
-              dieCornerRadius={10}
-              disableIndividual
-              faceColor={`hsl(var(--${user1}))`}
-              dotColor={`hsl(var(--${user1}-foreground))`}
-              defaultRoll={1}
-              numDice={1}
-              ref={dice1 as RefObject<ReactDiceRef>}
-              rollDone={() => null}
-            />
+            {gameStatus === "game" && (
+              <p className={`text-${user1}`}>You (⌐■_■)</p>
+            )}
+
+            <div
+              className={cn(
+                gameStatus === "loading"
+                  ? "animate__animated animate__wobble animate__infinite"
+                  : "",
+              )}>
+              <ReactDice
+                dieCornerRadius={10}
+                disableIndividual
+                faceColor={`hsl(var(--${user1}))`}
+                dotColor={`hsl(var(--${user1}-foreground))`}
+                defaultRoll={1}
+                numDice={1}
+                ref={dice1 as RefObject<ReactDiceRef>}
+                rollDone={() => null}
+              />
+            </div>
           </div>
           <div className={styles.diceArea}>
-            <p className={`text-${user2.color}`}>{user2?.username} (⌐■_■)</p>
-            <ReactDice
-              dieCornerRadius={10}
-              disableIndividual
-              faceColor={`hsl(var(--${user2.color}))`}
-              dotColor={`hsl(var(--${user2.color}-foreground))`}
-              defaultRoll={1}
-              numDice={1}
-              ref={dice2 as RefObject<ReactDiceRef>}
-              rollDone={() => null}
-            />
+            {gameStatus === "game" && (
+              <p className={`text-${user2.color}`}>{user2?.username} 𓁿</p>
+            )}
+            <div
+              className={cn(
+                gameStatus === "loading"
+                  ? "animate__animated animate__wobble animate__infinite"
+                  : "",
+              )}>
+              <ReactDice
+                dieCornerRadius={10}
+                disableIndividual
+                faceColor={`hsl(var(--${user2.color}))`}
+                dotColor={`hsl(var(--${user2.color}-foreground))`}
+                defaultRoll={1}
+                numDice={1}
+                ref={dice2 as RefObject<ReactDiceRef>}
+                rollDone={() => null}
+              />
+            </div>
           </div>
         </div>
       )}
-      {!isGame && (
+      {gameStatus === "closed" && (
         <>
           <div
             onClick={roll}

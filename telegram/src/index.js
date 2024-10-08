@@ -1,5 +1,6 @@
 import env from "dotenv"
-import {launchApp} from "./app/Application.js";
 env.config()
+
+import {launchApp} from "./app/Application.js";
 // Launch our application
 launchApp()

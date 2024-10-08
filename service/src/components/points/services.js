@@ -55,4 +55,17 @@ const getReferralEarnings = async (telegramId) => {
     return user[0]?.count ?? 0
 }
 
-module.exports = {addPoints, removePoints, referralBonus, getReferralEarnings}
+const getWonGameAmount = async (telegramId) => {
+    const user = await Points.aggregate([
+        {
+            $match: {
+                userTelegramId: telegramId,
+                pointType: "dice",
+                amount: 10
+            }
+        }
+    ]);
+    return user.length ?? 0
+}
+
+module.exports = {addPoints, removePoints, referralBonus, getReferralEarnings, getWonGameAmount}

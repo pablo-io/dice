@@ -11,6 +11,8 @@ const routerPath = "/user"
 
 router.post(`/authenticate`, controller.createUser);
 
+router.get(`/status`, controller.initApp);
+
 router.get(`/getRewardsList`, controller.getRewardList);
 
 router.get(`/getReferralLink`, controller.getReferralLink);
@@ -18,9 +20,6 @@ router.get(`/getReferralLink`, controller.getReferralLink);
 router.get(`/getUserReferralsStats`, controller.getReferralStats);
 
 router.get(`/getUserBalance`, controller.getUserBalance);
-
-router.get(`/getUserTasks`, controller.getUserTasks);
-
 
 router.get('/:telegramId', validate({params: Joi.object().keys({
         telegramId: telegramId.required()

@@ -43,7 +43,8 @@ function listenToCommands(bot) {
     await ctx.reply("Welcome to DiceID bot!", {
       reply_markup: {
         inline_keyboard: [
-          [{ text: "🎲 Play!", url: process.env.APP_URL }]
+          [{ text: "🎲 Play!", url: process.env.APP_URL }],
+          [{ text: "Support", url: "https://t.me/DiceID_support" }]
         ]
       }
     });

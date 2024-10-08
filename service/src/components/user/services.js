@@ -125,8 +125,24 @@ function combinationPrize(telegramIdString) {
     return result
 }
 
+const getUserBalanceService = async (telegramId) => {
+   const result = await Points.aggregate([
+        { $match: { userTelegramId: telegramId } },
+        {
+            $group: {
+                _id: "$userTelegramId",
+                totalQuantity: {
+                    $sum: "$amount"
+                }
+            }
+        }
+    ]);
+   return result.length > 0 ? result[0] : {totalQuantity: 0}
+}
+
 module.exports = {
     referralCodeInit,
     getRandomUserOpponent,
-    getNewUserInitPoints
+    getNewUserInitPoints,
+    getUserBalanceService
 }

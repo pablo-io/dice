@@ -3,7 +3,6 @@ const {router: userRouter, routerPath: userRouterPath} = require('../../componen
 const {router: diceRouter, routerPath: diceRouterPath} = require('../../components/dice/routes');
 const {router: tasksRouter, routerPath: tasksRouterPath} = require('../../components/tasks/routes');
 const {router: leaderBoardRouter, routerPath: leaderBoardRouterPath} = require('../../components/leaderBoard/routes');
-const {router: bonusRouter, routerPath: bonusRouterPath} = require('../../components/bonus/routes');
 
 const router = Router();
 
@@ -11,6 +10,5 @@ router.use(userRouterPath, userRouter);
 router.use(diceRouterPath, diceRouter);
 router.use(tasksRouterPath, tasksRouter);
 router.use(leaderBoardRouterPath, leaderBoardRouter);
-router.use(bonusRouterPath, bonusRouter);
 
 module.exports = router;

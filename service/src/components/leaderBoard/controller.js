@@ -1,5 +1,4 @@
 const Points = require("../points/model");
-const User = require("../user/model");
 const logger = require("../../config/logger");
 const catchAsync = require("./middlewares/catchAsync");
 const { getInitData } = require("../../middlewares/auth");
@@ -47,67 +46,11 @@ const getLeaderBoard = catchAsync(async (req, res) => {
       },
       {
         $skip: skip
-      },
-      { $limit : limit }
-    ]);
-    const currentUser = await User.aggregate([
-      {
-        $match: {
-          telegramId: initData.user.id
-        }
-      },
-      {
-        $lookup: {
-          from: "points",
-          as: "sortedPoints",
-          pipeline: [
-            {
-              $group: {
-                _id: "$userTelegramId",
-                count: {
-                  $sum: "$amount"
-                }
-              }
-            },
-            {
-              $sort: {
-                "count": -1
-              }
-            }
-          ]
-        }
-      },
-      {
-        $unwind: {
-          path: "$sortedPoints",
-          includeArrayIndex: "idx"
-        }
-      },
-      {
-        $match: {
-          $expr: {
-            $eq: [
-              "$telegramId",
-              "$sortedPoints._id"
-            ]
-          }
-        }
-      },
-      {
-        $project: {
-          nickname: "$nickname",
-          totalQuantity: "$sortedPoints.count",
-          rank: {
-            $add: [
-              "$idx",
-              1
-            ]
-          }
-        }
       }
     ]);
+    const currentUser = leaderboard.find(item => item._id === initData.user.id);
 
-    res.status(200).send({ current: currentUser[0], leaderboard: leaderboard });
+    res.status(200).send({ current: currentUser, leaderboard: leaderboard.slice(0, limit) });
   } catch (error) {
     logger.error(error);
     logger.flush();

@@ -17,6 +17,13 @@ export const Leaderboard: FC = () => {
   const [leaderboard, setLeaderboard] = useState<Array<User>>([]);
   const [user, setUser] = useState<User | null>(null);
 
+  const trimUsername = (username: string) => {
+    const MAX_USERNAME_LENGTH = 20;
+    return username.length > MAX_USERNAME_LENGTH
+      ? username.substring(0, MAX_USERNAME_LENGTH - 3) + "..."
+      : username;
+  };
+
   useEffect(() => {
     let ignore = false;
     getLeaderBoard("1").then(response => {
@@ -43,9 +50,7 @@ export const Leaderboard: FC = () => {
           {!!user && (
             <div className="w-full flex justify-between my-4">
               <TypographyLead>{user.rank}. </TypographyLead>
-              <TypographyP className="mr-auto pl-1">
-                {user.nickname}
-              </TypographyP>
+              <TypographyP className="mr-auto pl-1">You (⌐■_■)</TypographyP>
               <Button>{user.totalQuantity} 🎲</Button>
             </div>
           )}
@@ -58,7 +63,7 @@ export const Leaderboard: FC = () => {
                 <div className="w-full flex justify-between my-4">
                   <TypographyLead>{item.rank}. </TypographyLead>
                   <TypographyP className="mr-auto pl-1">
-                    {item.nickname}
+                    {trimUsername(item.nickname)}
                   </TypographyP>
                   <Button>{item.totalQuantity} 🎲</Button>
                 </div>

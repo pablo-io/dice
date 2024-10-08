@@ -24,31 +24,6 @@ const diceGame = catchAsync(async (req, res) => {
         playerNumber = randomInt(1, 7);
         opponentNumber = randomInt(1, 7);
       }
-      if (playerNumber > opponentNumber) {
-        await addPoints(initData.user.id, 10, "dice");
-      } else if (playerNumber < opponentNumber) {
-        await removePoints(initData.user.id, 5, "dice");
-      }
-
-      const bannedTillDate = userBanRecord?.bannedTill ? new Date(userBanRecord.bannedTill).getTime() : new Date().getTime() - 3600000;
-
-      const gamesAfterLastBan = await Points.find({
-        userTelegramId: initData.user.id,
-        createdAt: { $gt: bannedTillDate },
-        pointType: "dice"
-      });
-
-      if (gamesAfterLastBan.length > 10) {
-        let chanceOfBan = randomInt(0, 10);
-        if (chanceOfBan > 5 && chanceOfBan <= 7) {
-          await Dice.findOneAndUpdate({ userTelegramId: initData.user.id }, { bannedTill: new Date(Date.now() + 3600000) }, {
-            upsert: true,
-            new: true,
-            setDefaultsOnInsert: true
-          });
-        }
-      }
-
 
       res.status(200).send({
         you: {
@@ -60,11 +35,37 @@ const diceGame = catchAsync(async (req, res) => {
           number: opponentNumber
         }
       });
+
+      if (playerNumber > opponentNumber) {
+        await addPoints(initData.user.id, 10, "dice");
+      } else if (playerNumber < opponentNumber) {
+        await removePoints(initData.user.id, 5, "dice");
+      }
+
     }
   } catch (error) {
     logger.error(error);
     logger.flush();
     res.status(500).send(error);
+  }
+
+  const bannedTillDate = userBanRecord?.bannedTill ? new Date(userBanRecord.bannedTill).getTime() : new Date().getTime() - 3600000;
+
+  const gamesAfterLastBan = await Points.find({
+    userTelegramId: initData.user.id,
+    createdAt: { $gt: bannedTillDate },
+    pointType: "dice"
+  });
+
+  if (gamesAfterLastBan.length > 10) {
+    let chanceOfBan = randomInt(0, 10);
+    if (chanceOfBan > 5 && chanceOfBan <= 7) {
+      await Dice.findOneAndUpdate({ userTelegramId: initData.user.id }, { bannedTill: new Date(Date.now() + 3600000) }, {
+        upsert: true,
+        new: true,
+        setDefaultsOnInsert: true
+      });
+    }
   }
 });
 

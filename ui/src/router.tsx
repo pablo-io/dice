@@ -1,10 +1,10 @@
 import {createBrowserRouter} from "react-router-dom";
 import {Leaderboard} from "@/screens/Leaderboard/Leaderboard.tsx";
 import {Reward} from "@/screens/Reward/Reward.tsx";
-import {Tasks} from "@/screens/Tasks/Tasks.tsx";
 import {Main} from "@/screens/Main/Main.tsx";
 import {App} from "@/App.tsx";
 import {Friends} from "@/screens/Friends/Friends.tsx";
+import {TasksScreen} from "@/screens/Tasks/TasksScreen.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -21,7 +21,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/tasks",
-        element: <Tasks />,
+        element: <TasksScreen />,
       },
       {
         path: "/leaderboard",
